@@ -95,6 +95,16 @@ class invite {
 
     cb(null, true);
   };
+
+  @muxrpc('async')
+  public use = (_opts: any, cb: any) => {
+    cb(new Error('ssb.invite.use not supported by ' + this.ssb.id));
+  };
+
+  @muxrpc('async')
+  public create = (_opts: any, cb: any) => {
+    cb(new Error('ssb.invite.create not supported by ' + this.ssb.id));
+  };
 }
 
 module.exports = invite;
