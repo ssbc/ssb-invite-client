@@ -15,7 +15,7 @@
   "dependencies": {
     "@types/node": "12",
     "explain-error": "^1.0.4",
-    "promisify-tuple": "~1.0.1",
+    "promisify-tuple": "^1.2.0",
     "secret-stack-decorators": "~1.1.0",
     "ssb-ref": "^2.13.0"
   },
