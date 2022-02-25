@@ -27,13 +27,13 @@
     "ssb-client": "~4.9.0",
     "ssb-friends": "^4.4.4",
     "ssb-invite": "~2.1.6",
-    "ssb-keys": "~7.2.0",
+    "ssb-keys": "~8.2.0",
     "ssb-replicate": "^1.0.1",
     "ssb-server": "^15.1.1",
     "ssb-ws": "^6.2.0",
     "tape": "^5.2.0",
     "tap-spec": "^5.0.0",
-    "typescript": "~4.2.2"
+    "typescript": "~4.5.5"
   },
   "scripts": {
     "compile": "tsc",
