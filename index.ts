@@ -3,6 +3,19 @@ import {plugin, muxrpc} from 'secret-stack-decorators';
 const explain = require('explain-error');
 const Ref = require('ssb-ref');
 
+interface InviteObject {
+  invite: string;
+}
+
+type Invite = string | InviteObject;
+
+interface ParsedInvite {
+  remote: string;
+  key: string;
+  host: string;
+  port: number;
+}
+
 @plugin('1.0.0')
 class invite {
   private readonly ssb: any;
@@ -11,9 +24,8 @@ class invite {
     this.ssb = ssb;
   }
 
-  private parseInvite(input: any): [any, any?] {
-    let invite: string =
-      input && typeof input === 'object' ? input.invite : input;
+  private parseInvite(input: Invite): [any, ParsedInvite?] {
+    let invite = input && typeof input === 'object' ? input.invite : input;
 
     if (typeof invite !== 'string' || !invite) {
       return [new Error('is not a string invite code: ' + invite)];
@@ -32,7 +44,7 @@ class invite {
 
     if (Ref.isLegacyInvite(invite)) {
       const parts = invite.split('~');
-      const parsed = Ref.parseAddress(parts[0]); //.split(':')
+      const parsed: ParsedInvite = Ref.parseAddress(parts[0]);
       // convert legacy code to multiserver invite code.
       const protocol = parsed.host.endsWith('.onion') ? 'onion:' : 'net:';
       parsed.remote =
@@ -52,7 +64,7 @@ class invite {
   }
 
   @muxrpc('async')
-  public accept = async (invite: any, cb: any) => {
+  public accept = async (invite: Invite, cb: any) => {
     if (!this.ssb.conn || !this.ssb.conn.connect || !this.ssb.conn.remember) {
       cb(new Error('ssb-invite-client requires ssb-conn'));
       return;
@@ -61,6 +73,7 @@ class invite {
     // parse the code
     const [e0, parsed] = this.parseInvite(invite);
     if (e0) return cb(explain(e0, 'Could not accept invalid invite code'));
+    if (!parsed) return cb(new Error('Could not parse invite code: ' + invite));
 
     // connect via SSB CONN
     const addr = parsed.remote;
