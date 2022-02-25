@@ -1,7 +1,7 @@
 import run = require('promisify-tuple');
 import {plugin, muxrpc} from 'secret-stack-decorators';
-var explain = require('explain-error');
-var Ref = require('ssb-ref');
+const explain = require('explain-error');
+const Ref = require('ssb-ref');
 
 @plugin('1.0.0')
 class invite {
@@ -31,11 +31,10 @@ class invite {
     }
 
     if (Ref.isLegacyInvite(invite)) {
-      var parts = invite.split('~');
+      const parts = invite.split('~');
       const parsed = Ref.parseAddress(parts[0]); //.split(':')
-      //convert legacy code to multiserver invite code.
-      var protocol = 'net:';
-      if (parsed.host.endsWith('.onion')) protocol = 'onion:';
+      // convert legacy code to multiserver invite code.
+      const protocol = parsed.host.endsWith('.onion') ? 'onion:' : 'net:';
       parsed.remote =
         protocol +
         parsed.host +
