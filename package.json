@@ -12,6 +12,9 @@
     "node": ">=8.10"
   },
   "main": "lib/index.js",
+  "files": [
+    "lib/*"
+  ],
   "dependencies": {
     "@types/node": "12",
     "explain-error": "^1.0.4",
