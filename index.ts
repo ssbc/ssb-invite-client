@@ -5,6 +5,7 @@ const Ref = require('ssb-ref');
 
 interface InviteObject {
   invite: string;
+  shouldPublish?: boolean;
 }
 
 type Invite = string | InviteObject;
@@ -70,6 +71,11 @@ class invite {
       return;
     }
 
+    const shouldPublish =
+      typeof invite === 'object' && typeof invite.shouldPublish !== 'undefined'
+        ? invite.shouldPublish
+        : true;
+
     // parse the code
     const [e0, parsed] = this.parseInvite(invite);
     if (e0) return cb(explain(e0, 'Could not accept invalid invite code'));
@@ -85,21 +91,23 @@ class invite {
     const [e2] = await run(rpc.invite.use)({feed: this.ssb.id});
     if (e2) return cb(explain(e2, 'Invite not accepted by the pub'));
 
-    // follow the peer
-    const [e3] = await run(this.ssb.publish)({
-      type: 'contact',
-      following: true,
-      autofollow: true,
-      contact: parsed.key,
-    });
-    if (e3) return cb(explain(e3, 'Unable to follow friend behind invite'));
+    if (shouldPublish) {
+      // follow the peer
+      const [e3] = await run(this.ssb.publish)({
+        type: 'contact',
+        following: true,
+        autofollow: true,
+        contact: parsed.key,
+      });
+      if (e3) return cb(explain(e3, 'Unable to follow friend behind invite'));
 
-    // announce the pub to my friends
-    const [e4] = await run(this.ssb.publish)({
-      type: 'pub',
-      address: parsed,
-    });
-    if (e4) return cb(explain(e4, 'Unable to announce pub to my friends'));
+      // announce the pub to my friends
+      const [e4] = await run(this.ssb.publish)({
+        type: 'pub',
+        address: parsed,
+      });
+      if (e4) return cb(explain(e4, 'Unable to announce pub to my friends'));
+    }
 
     // remember in SSB CONN
     const [e5] = await run(this.ssb.conn.remember)(addr, connData);
